@@ -32,12 +32,16 @@ builder.Services
         x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
+var databaseName = "claims";
+var connectionString = sqlContainer.GetConnectionString().Replace("Database=master", $"Database={databaseName}");
+var mongoConnectionString = mongoContainer.GetConnectionString();
+
 builder.Services.AddDbContext<AuditContext>(options =>
-    options.UseSqlServer(sqlContainer.GetConnectionString()));
+    options.UseSqlServer(connectionString));
 
 builder.Services.AddDbContext<ClaimsContext>(options =>
 {
-    var client = new MongoClient(mongoContainer.GetConnectionString());
+    var client = new MongoClient(mongoConnectionString);
     var database = client.GetDatabase(builder.Configuration["MongoDb:DatabaseName"]); // Use a default/test database name
     options.UseMongoDB(database.Client, database.DatabaseNamespace.DatabaseName);
 });
@@ -66,6 +70,8 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<AuditContext>();
     context.Database.Migrate();
 }
+Console.WriteLine($"SQL Connection String: {connectionString}");
+Console.WriteLine($"MongoDB Connection String: {mongoConnectionString}");
 
 app.Run();
 
