@@ -20,7 +20,7 @@ public class CoversController : ControllerBase
     }
 
     [HttpPost("compute")]
-    public async Task<ActionResult> ComputePremiumAsync(DateTime startDate, DateTime endDate, CoverType coverType)
+    public async Task<ActionResult> ComputePremiumAsync(DateOnly startDate, DateOnly endDate, CoverType coverType)
     {
         return Ok(ComputePremium(startDate, endDate, coverType));
     }
@@ -62,7 +62,7 @@ public class CoversController : ControllerBase
         }
     }
 
-    private decimal ComputePremium(DateTime startDate, DateTime endDate, CoverType coverType)
+    private decimal ComputePremium(DateOnly startDate, DateOnly endDate, CoverType coverType)
     {
         var multiplier = 1.3m;
         if (coverType == CoverType.Yacht)
@@ -81,7 +81,7 @@ public class CoversController : ControllerBase
         }
 
         var premiumPerDay = 1250 * multiplier;
-        var insuranceLength = (endDate - startDate).TotalDays;
+        var insuranceLength = endDate.DayNumber - startDate.DayNumber;
         var totalPremium = 0m;
 
         for (var i = 0; i < insuranceLength; i++)
