@@ -7,11 +7,13 @@ public class ClaimsService
 {
     
     private readonly IRepository<Claim> _claimsRepo;
-    private readonly Auditor _auditor;
+    private readonly IRepository<Cover> _coversRepo;
+    private readonly IAuditor _auditor;
     
-    public ClaimsService(IRepository<Claim> claimsRepo, Auditor auditor)
+    public ClaimsService(IRepository<Claim> claimsRepo, IRepository<Cover> coversRepo, IAuditor auditor)
     {
         _claimsRepo = claimsRepo;
+        _coversRepo = coversRepo;
         _auditor = auditor;
     }
     public async Task<IEnumerable<ClaimDto>> GetAsync()

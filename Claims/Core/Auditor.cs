@@ -2,7 +2,13 @@
 
 namespace Claims.Core
 {
-    public class Auditor
+    public interface IAuditor
+    {
+        void AuditClaim(string id, string httpRequestType);
+        void AuditCover(string id, string httpRequestType);
+    }
+    
+    public class Auditor: IAuditor
     {
         private readonly AuditContext _auditContext;
 
