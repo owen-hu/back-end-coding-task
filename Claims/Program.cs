@@ -48,8 +48,11 @@ builder.Services.AddDbContext<ClaimsContext>(options =>
     options.UseMongoDB(database.Client, database.DatabaseNamespace.DatabaseName);
 });
 
+builder.Services.AddScoped<IRepository<Claim>, ClaimsRepository>();
+builder.Services.AddScoped<IRepository<Cover>, CoversRepository>();
 builder.Services.AddScoped<IPremiumCalculator, BadPremiumCalculator>();
 builder.Services.AddScoped<Auditor, Auditor>();
+builder.Services.AddScoped<ClaimsService, ClaimsService>();
 builder.Services.AddScoped<CoversService, CoversService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

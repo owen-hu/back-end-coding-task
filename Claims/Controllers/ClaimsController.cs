@@ -1,5 +1,4 @@
-using Claims.DataLayer.Auditing;
-using Claims.DataLayer.Claims;
+using Claims.ApiLayer;
 using Claims.Core;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,42 +10,37 @@ namespace Claims.Controllers
     public class ClaimsController : ControllerBase
     {
         private readonly ILogger<ClaimsController> _logger;
-        private readonly ClaimsContext _claimsContext;
-        private readonly Auditor _auditor;
+        private readonly ClaimsService _claimsService;
 
-        public ClaimsController(ILogger<ClaimsController> logger, ClaimsContext claimsContext, AuditContext auditContext)
+        public ClaimsController(ILogger<ClaimsController> logger, ClaimsService claimsService)
         {
             _logger = logger;
-            _claimsContext = claimsContext;
-            _auditor = new Auditor(auditContext);
+            _claimsService = claimsService;
         }
 
         [HttpGet]
-        public async Task<IEnumerable<Claim>> GetAsync()
+        public async Task<IEnumerable<ClaimDto>> GetAsync()
         {
-            return await _claimsContext.GetClaimsAsync();
+            return await _claimsService.GetAsync();
         }
 
         [HttpPost]
-        public async Task<ActionResult> CreateAsync(Claim claim)
+        public async Task<ActionResult> CreateAsync(ClaimDto claim)
         {
-            claim.Id = Guid.NewGuid().ToString();
-            await _claimsContext.AddItemAsync(claim);
-            _auditor.AuditClaim(claim.Id, "POST");
+            claim = await _claimsService.CreateAndAuditAsync(claim);
             return Ok(claim);
         }
 
         [HttpDelete("{id}")]
         public async Task DeleteAsync(string id)
         {
-            _auditor.AuditClaim(id, "DELETE");
-            await _claimsContext.DeleteItemAsync(id);
+            await _claimsService.DeleteAndAuditAsync(id);
         }
 
         [HttpGet("{id}")]
-        public async Task<Claim> GetAsync(string id)
+        public async Task<ActionResult> GetAsync(string id)
         {
-            return await _claimsContext.GetClaimAsync(id);
+            return Ok(await _claimsService.GetForIdAsync(id));
         }
     }
 }

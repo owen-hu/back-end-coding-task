@@ -47,6 +47,7 @@ namespace Claims.Tests
             var claim = new ClaimDto()
             {
                 CoverId = coverId,
+                Name="",
                 CreatedDate = DateOnly.Parse(createdDate),
                 DamageCost = damageCost,
                 ClaimType = claimType,
@@ -58,7 +59,7 @@ namespace Claims.Tests
             response.EnsureSuccessStatusCode();
             
             var jsonText = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
-            var responseClaim = JsonSerializer.Deserialize<Claim>(jsonText);
+            var responseClaim = JsonSerializer.Deserialize<ClaimDto>(jsonText);
             Assert.NotNull(responseClaim);
             Assert.Equal(claim.CoverId, responseClaim.Id);
         }

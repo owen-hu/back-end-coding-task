@@ -1,88 +1,70 @@
 ﻿using Claims.ApiLayer;
 using Claims.DataLayer.Claims;
-using Microsoft.EntityFrameworkCore;
-
 
 namespace Claims.Core;
 
 public class ClaimsService
 {
     
-}
-
-public class CoversService
-{
-    
-    private readonly ClaimsContext _claimsContext;
+    private readonly IRepository<Claim> _claimsRepo;
     private readonly Auditor _auditor;
-    public IPremiumCalculator PremiumCalculator {get; init;}
     
-    public CoversService(ClaimsContext claimsContext, Auditor auditor, IPremiumCalculator premiumCalculator)
+    public ClaimsService(IRepository<Claim> claimsRepo, Auditor auditor)
     {
-        _claimsContext = claimsContext;
+        _claimsRepo=claimsRepo;
         _auditor = auditor;
-        PremiumCalculator = premiumCalculator;
+    }
+    public async Task<IEnumerable<ClaimDto>> GetAsync()
+    {
+        return (await _claimsRepo.GetItemsAsync())
+            .Select(CreateClaimDto);
+    }
+
+    public async Task<ClaimDto?> GetForIdAsync(string id)
+    {
+        var claim = await _claimsRepo.GetItemAsync(id);
+        if (claim == null)
+            return null;
+        
+        return CreateClaimDto(claim);
     }
     
-    public async Task<IEnumerable<CoverDto>> GetAsync()
+    public async Task<ClaimDto> CreateAndAuditAsync(ClaimDto claimDto)
     {
-        var covers = await _claimsContext.Covers.ToListAsync();
-        return covers.Select(CreateCoverDto);
-    }
-
-    public async Task<CoverDto?> GetForIdAsync(string id)
-    {
-        var cover = await _claimsContext.Covers.FirstOrDefaultAsync(x => x.Id == id);
-        if (cover == null) return null;
-        return CreateCoverDto(cover);
-    }
-
-    private static CoverDto CreateCoverDto(Cover cover)
-    {
-        return new CoverDto()
-        {
-            Id = cover.Id,
-            CoverType = cover.Type,
-            StartDate = cover.StartDate,
-            EndDate = cover.EndDate,
-            Premium = cover.Premium,
-        };
-    }
-
-    public async Task<CoverDto> CreateAndAuditAsync(CoverDto coverDto)
-    {
-        var premium = PremiumCalculator.Calculate(coverDto);
-        var cover = await CreateCoverAsync(coverDto, premium);
-        
-        _auditor.AuditCover(cover.Id, "POST");
-        
-        return CreateCoverDto(cover); ;
-    }
-
-    private async Task<Cover> CreateCoverAsync(CoverDto coverDto, decimal premium)
-    {
-        var cover = new Cover()
+        var claim = new Claim()
         {
             Id = Guid.NewGuid().ToString(),
-            Premium = premium,
-            StartDate = coverDto.StartDate,
-            EndDate = coverDto.EndDate,
-            Type = coverDto.CoverType,
+            Name = claimDto.Name,
+            CoverId = claimDto.CoverId,
+            DamageCost = claimDto.DamageCost,
+            Created = claimDto.CreatedDate,
+            Type = claimDto.ClaimType,
         };
-        
-        _claimsContext.Covers.Add(cover);
-        await _claimsContext.SaveChangesAsync();
-        return cover;
+        await _claimsRepo.AddItemAsync(claim);
+        _auditor.AuditClaim(claim.Id, "POST");
+        return CreateClaimDto(claim);
     }
 
     public async Task DeleteAndAuditAsync(string id)
     {
-        _auditor.AuditCover(id, "DELETE");
-        var cover = await _claimsContext.Covers.Where(cover => cover.Id == id).SingleOrDefaultAsync();
-        if (cover is not null)
+        _auditor.AuditClaim(id, "DELETE");
+        var claim = await _claimsRepo.GetItemAsync(id);
+        if (claim != null)
         {
-            _claimsContext.Covers.Remove(cover);
-            await _claimsContext.SaveChangesAsync();
+            await _claimsRepo.DeleteItemAsync(claim);
         }
+    }
+
+    private ClaimDto CreateClaimDto(Claim claim)
+    {
+        return new ClaimDto
+        {
+            Id = claim.Id,
+            Name = claim.Name,
+            CreatedDate = claim.Created,
+            CoverId = claim.CoverId,
+            DamageCost = claim.DamageCost,
+            ClaimType = claim.Type,
+        };
     }
 }
