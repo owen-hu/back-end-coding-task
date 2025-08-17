@@ -21,7 +21,6 @@
 
   <ItemGroup>
     <Folder Include="DataLayer\" />
-    <Folder Include="Dto\" />
   </ItemGroup>
 
 </Project>

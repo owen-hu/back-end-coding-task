@@ -1,10 +1,12 @@
-﻿namespace Claims.Auditing
+﻿using Claims.DataLayer.Auditing;
+
+namespace Claims.Core
 {
-    public class Auditer
+    public class Auditor
     {
         private readonly AuditContext _auditContext;
 
-        public Auditer(AuditContext auditContext)
+        public Auditor(AuditContext auditContext)
         {
             _auditContext = auditContext;
         }

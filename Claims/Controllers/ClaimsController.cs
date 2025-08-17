@@ -1,5 +1,6 @@
-using Claims.Auditing;
-using Claims.Claims;
+using Claims.DataLayer.Auditing;
+using Claims.DataLayer.Claims;
+using Claims.Core;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -11,13 +12,13 @@ namespace Claims.Controllers
     {
         private readonly ILogger<ClaimsController> _logger;
         private readonly ClaimsContext _claimsContext;
-        private readonly Auditer _auditer;
+        private readonly Auditor _auditor;
 
         public ClaimsController(ILogger<ClaimsController> logger, ClaimsContext claimsContext, AuditContext auditContext)
         {
             _logger = logger;
             _claimsContext = claimsContext;
-            _auditer = new Auditer(auditContext);
+            _auditor = new Auditor(auditContext);
         }
 
         [HttpGet]
@@ -31,14 +32,14 @@ namespace Claims.Controllers
         {
             claim.Id = Guid.NewGuid().ToString();
             await _claimsContext.AddItemAsync(claim);
-            _auditer.AuditClaim(claim.Id, "POST");
+            _auditor.AuditClaim(claim.Id, "POST");
             return Ok(claim);
         }
 
         [HttpDelete("{id}")]
         public async Task DeleteAsync(string id)
         {
-            _auditer.AuditClaim(id, "DELETE");
+            _auditor.AuditClaim(id, "DELETE");
             await _claimsContext.DeleteItemAsync(id);
         }
 

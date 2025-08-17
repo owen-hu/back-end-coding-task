@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MongoDB.EntityFrameworkCore.Extensions;
 
-namespace Claims.Claims;
+namespace Claims.DataLayer.Claims;
 
 public class ClaimsContext : DbContext
 {

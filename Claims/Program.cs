@@ -1,10 +1,11 @@
-using Claims.Auditing;
-using Claims.Controllers;
+using Claims.DataLayer.Auditing;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
-using Claims.Claims;
+using Claims.Controllers;
+using Claims.Core;
+using Claims.DataLayer.Claims;
 using Testcontainers.MongoDb;
 using Testcontainers.MsSql;
 
@@ -46,6 +47,10 @@ builder.Services.AddDbContext<ClaimsContext>(options =>
     var database = client.GetDatabase(builder.Configuration["MongoDb:DatabaseName"]); // Use a default/test database name
     options.UseMongoDB(database.Client, database.DatabaseNamespace.DatabaseName);
 });
+
+builder.Services.AddScoped<IPremiumCalculator, BadPremiumCalculator>();
+builder.Services.AddScoped<Auditor, Auditor>();
+builder.Services.AddScoped<CoversService, CoversService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

@@ -1,8 +1,25 @@
-﻿namespace Claims.Core;
+﻿using Claims.ApiLayer;
+using Claims.DataLayer.Claims;
+
+namespace Claims.Core;
 
 public interface IPremiumCalculator
 {
     decimal Calculate(DateOnly startDate, DateOnly endDate, CoverType coverType);
+}
+
+public static class PremiumCalculatorExtensions
+{
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="calculator"></param>
+    /// <param name="coverDto"></param>
+    /// <returns></returns>
+    public static decimal Calculate(this IPremiumCalculator calculator, CoverDto coverDto)
+    {
+        return calculator.Calculate(coverDto.StartDate, coverDto.EndDate, coverDto.CoverType);
+    }
 }
 
 /// <summary>

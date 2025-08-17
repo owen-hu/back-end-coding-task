@@ -1,5 +1,9 @@
 ﻿using System.Text.Json;
+using Claims.ApiLayer;
+using Claims.Core;
+using Claims.DataLayer.Claims;
 using Claims.Tests.Fixtures;
+using Microsoft.AspNetCore.OutputCaching;
 using Xunit;
 
 namespace Claims.Tests
@@ -29,24 +33,23 @@ namespace Claims.Tests
             
             //TODO: Apart from ensuring 200 OK being returned, what else can be asserted?
             var jsonText = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
-            var claims = JsonSerializer.Deserialize<List<Claim>>(jsonText);
+            var claims = JsonSerializer.Deserialize<List<ClaimDto>>(jsonText);
             Assert.NotNull(claims); 
             Assert.Empty(claims);
         }
 
 
         [Theory]
-        [InlineData("123", "456", "2025-01-01", 1000000, ClaimType.Collision)]
-        public async Task Add_Claim_And_Check_If_Present(string id, string coverId, string createdDate, 
+        [InlineData("456", "2025-01-01", 1000000, ClaimType.Collision)]
+        public async Task Add_Claim_And_Check_If_Present(string coverId, string createdDate, 
             decimal damageCost, ClaimType claimType)
         {
-            var claim = new Claim()
+            var claim = new ClaimDto()
             {
-                Id = id,
                 CoverId = coverId,
-                Created = DateOnly.Parse(createdDate),
+                CreatedDate = DateOnly.Parse(createdDate),
                 DamageCost = damageCost,
-                Type = claimType,
+                ClaimType = claimType,
             };
             
             var client = _appFixture.GetHttpClient();
