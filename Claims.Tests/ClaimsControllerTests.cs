@@ -1,9 +1,7 @@
 ﻿using System.Text.Json;
 using Claims.ApiLayer;
 using Claims.Core;
-using Claims.DataLayer.Claims;
 using Claims.Tests.Fixtures;
-using Microsoft.AspNetCore.OutputCaching;
 using Xunit;
 
 namespace Claims.Tests

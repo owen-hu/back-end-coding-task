@@ -11,7 +11,7 @@ public class ClaimsService
     
     public ClaimsService(IRepository<Claim> claimsRepo, Auditor auditor)
     {
-        _claimsRepo=claimsRepo;
+        _claimsRepo = claimsRepo;
         _auditor = auditor;
     }
     public async Task<IEnumerable<ClaimDto>> GetAsync()
