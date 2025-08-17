@@ -19,4 +19,9 @@
     <PackageReference Include="Testcontainers.MsSql" Version="4.6.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DataLayer\" />
+    <Folder Include="Dto\" />
+  </ItemGroup>
+
 </Project>

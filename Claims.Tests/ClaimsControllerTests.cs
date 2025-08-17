@@ -4,6 +4,12 @@ using Xunit;
 
 namespace Claims.Tests
 {
+    /// <summary>
+    /// Validate that ClaimsController REST end-points.
+    /// </summary>
+    /// <remarks>
+    /// Integration Test, not a Unit test
+    /// </remarks>
     public class ClaimsControllerTests: IClassFixture<AppFixture>
     {
 
@@ -48,7 +54,10 @@ namespace Claims.Tests
             var response = await client.PostAsync("/Claims", new StringContent(JsonSerializer.Serialize(claim)), TestContext.Current.CancellationToken);
             response.EnsureSuccessStatusCode();
             
-           //ToDO: Make sure that this actually got saved.
+            var jsonText = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+            var responseClaim = JsonSerializer.Deserialize<Claim>(jsonText);
+            Assert.NotNull(responseClaim);
+            Assert.Equal(claim.CoverId, responseClaim.Id);
         }
         
 

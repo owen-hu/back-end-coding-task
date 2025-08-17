@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
+using Claims.Claims;
 using Testcontainers.MongoDb;
 using Testcontainers.MsSql;
 
