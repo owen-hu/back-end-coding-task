@@ -7,10 +7,10 @@ namespace Claims.Core;
 public class CoversService
 {
     private readonly IRepository<Cover> _coversRepo;
-    private readonly Auditor _auditor;
+    private readonly IAuditor _auditor;
     public IPremiumCalculator PremiumCalculator {get; init;}
     
-    public CoversService(IRepository<Cover> coversRepo, Auditor auditor, IPremiumCalculator premiumCalculator)
+    public CoversService(IRepository<Cover> coversRepo, IAuditor auditor, IPremiumCalculator premiumCalculator)
     {
         _coversRepo = coversRepo;
         _auditor = auditor;

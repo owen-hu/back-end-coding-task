@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Text;
+using System.Text.Json;
 using Claims.ApiLayer;
 using Claims.Core;
 using Claims.Tests.Fixtures;
@@ -53,7 +54,9 @@ namespace Claims.Tests
             
             var client = _appFixture.GetHttpClient();
             
-            var response = await client.PostAsync("/Claims", new StringContent(JsonSerializer.Serialize(claim)), TestContext.Current.CancellationToken);
+            var serializedClaim = JsonSerializer.Serialize(claim);
+            
+            var response = await client.PostAsync("/Claims", new StringContent(serializedClaim, Encoding.UTF8, "application/json"), TestContext.Current.CancellationToken);
             response.EnsureSuccessStatusCode();
             
             var jsonText = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
