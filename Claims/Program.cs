@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
+using Claims.ApiLayer;
 using Claims.Core;
 using Claims.DataLayer.Claims;
 using Testcontainers.MongoDb;
@@ -52,6 +53,7 @@ builder.Services.AddScoped<IRepository<Claim>, ClaimsRepository>();
 builder.Services.AddScoped<IRepository<Cover>, CoversRepository>();
 builder.Services.AddScoped<IPremiumCalculator, BadPremiumCalculator>();
 builder.Services.AddScoped<IAuditor, Auditor>();
+builder.Services.AddScoped<IValidator<ClaimDto>, ClaimValidator>();
 builder.Services.AddScoped<ClaimsService, ClaimsService>();
 builder.Services.AddScoped<CoversService, CoversService>();
 

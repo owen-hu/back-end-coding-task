@@ -7,14 +7,15 @@ public class ClaimsService
 {
     
     private readonly IRepository<Claim> _claimsRepo;
-    private readonly IRepository<Cover> _coversRepo;
     private readonly IAuditor _auditor;
+    private readonly IValidator<ClaimDto> _validator;
     
-    public ClaimsService(IRepository<Claim> claimsRepo, IRepository<Cover> coversRepo, IAuditor auditor)
+    public ClaimsService(IRepository<Claim> claimsRepo, IAuditor auditor,
+        IValidator<ClaimDto> validator)
     {
         _claimsRepo = claimsRepo;
-        _coversRepo = coversRepo;
         _auditor = auditor;
+        _validator = validator;
     }
     public async Task<IEnumerable<ClaimDto>> GetAsync()
     {
@@ -31,8 +32,14 @@ public class ClaimsService
         return CreateClaimDto(claim);
     }
     
+    /// <summary>
+    /// Only creates and Audits if it's valid
+    /// </summary>
+    /// <param name="claimDto"></param>
+    /// <returns></returns>
     public async Task<ClaimDto> CreateAndAuditAsync(ClaimDto claimDto)
     {
+        await _validator.ValidateAsync(claimDto); //Will throw an exception if it's not valid.
         var claim = new Claim()
         {
             Id = Guid.NewGuid().ToString(),

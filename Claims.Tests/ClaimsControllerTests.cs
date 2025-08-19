@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Claims.ApiLayer;
 using Claims.Core;
 using Claims.Tests.Fixtures;
@@ -13,6 +14,7 @@ namespace Claims.Tests
     /// <remarks>
     /// Integration Test, not a Unit test
     /// </remarks>
+    [Trait("Category", "Integration")]
     public class ClaimsControllerTests: IClassFixture<AppFixture>
     {
 
@@ -31,6 +33,7 @@ namespace Claims.Tests
             response.EnsureSuccessStatusCode();
             
             //TODO: Apart from ensuring 200 OK being returned, what else can be asserted?
+            // IN this case, we assure that the expected response is an empty array.
             var jsonText = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
             var claims = JsonSerializer.Deserialize<List<ClaimDto>>(jsonText);
             Assert.NotNull(claims); 
@@ -60,9 +63,15 @@ namespace Claims.Tests
             response.EnsureSuccessStatusCode();
             
             var jsonText = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
-            var responseClaim = JsonSerializer.Deserialize<ClaimDto>(jsonText);
+            var responseClaim = JsonSerializer.Deserialize<ClaimDto>(jsonText, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                Converters = { new JsonStringEnumConverter() }
+            });
+            
             Assert.NotNull(responseClaim);
-            Assert.Equal(claim.CoverId, responseClaim.Id);
+            Assert.Equal(coverId, responseClaim.CoverId);
+            Assert.NotNull(responseClaim.Id);
         }
         
 

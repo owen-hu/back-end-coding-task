@@ -8,11 +8,11 @@ namespace Claims.Tests;
 /// </summary>
 public abstract class PremiumCalculatorTests
 {
-
     /// <summary>
     /// These are the Tests for the Original Premium Calculator.
     /// It's pretty good at calculating a zero-day premium. 
     /// </summary>
+    [Trait("Category", "Failing")]
     public class BadPremiumCalculatorTests: PremiumCalculatorTests
     {
         protected override IPremiumCalculator CreateCalculator()
@@ -22,8 +22,9 @@ public abstract class PremiumCalculatorTests
     }
 
     /// <summary>
-    /// This is the "Fixed" Premium Calculator, 
+    /// This is the "Fixed" Premium Calculator. 
     /// </summary>
+    [Trait("Category", "Unit")]
     public class TranchedPremiumCalculatorTests: PremiumCalculatorTests
     {
         protected override IPremiumCalculator CreateCalculator()

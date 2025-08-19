@@ -5,6 +5,7 @@ using Xunit;
 
 namespace Claims.Tests;
 
+[Trait("Category", "Integration")]
 public class CoversControllerTests: IClassFixture<AppFixture>
 {
     private readonly AppFixture _appFixture;

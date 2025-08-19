@@ -6,94 +6,42 @@ using Moq;
 
 namespace Claims.Tests;
 
+[Trait("Category", "Unit")]
 public class ClaimsServiceTests
 {
 
-    [Theory]
-    [MemberData(nameof(GetInvalidClaims))]
-    public async Task Add_Claim_FailsValidation(Cover? cover, ClaimDto claimDto, string expectedDescription)
+    [Fact]
+    public async Task Claim_That_Fails_Validation_Should_Not_Add_Or_Audit()
     {
         //AAA pattern:
         
         //Arrange:
         var mockClaimsRepo = new Mock<IRepository<Claim>>();
-        mockClaimsRepo.Setup(x=> x.AddItemAsync(It.IsAny<Claim>())).Throws(new Exception("Should never try and add this."));
-        
-        var mockCoversRepo = new Mock<IRepository<Cover>>();
-
-        if (cover != null)
-        {
-            mockCoversRepo.Setup(x=> x.GetItemAsync(cover.Id)).ReturnsAsync(cover);
-        }
-
         var auditor = new Mock<IAuditor>();
+        var validator = new Mock<IValidator<ClaimDto>>();
+
+        //Make sure we don't try and add it.
+        mockClaimsRepo.Setup(x=> x.AddItemAsync(It.IsAny<Claim>()))
+            .Throws(new Exception("Should never try and add this."));
+
+        //Make sure we don't try and audit it.
+        auditor.Setup(x=> x.AuditClaim(It.IsAny<string>(), It.IsAny<string>()))
+            .Throws(new Exception("Should never try and audit this."));
+
+        //Validator should always throw "FAIL"
+        validator.Setup( x=> x.ValidateAsync(It.IsAny<ClaimDto>()))
+            .ThrowsAsync(new ValidationException("FAIL"));
+        
+        var claimsService = new ClaimsService(mockClaimsRepo.Object, auditor.Object, validator.Object);
+
         
         //Act
-        var claimsService = new ClaimsService(mockClaimsRepo.Object, mockCoversRepo.Object, auditor.Object);
-        var ex = await Assert.ThrowsAnyAsync<Exception>( async () =>
+        var ex = await Assert.ThrowsAnyAsync<ValidationException>( async () =>
         {
-            _ = await claimsService.CreateAndAuditAsync(claimDto);
+            _ = await claimsService.CreateAndAuditAsync(new ClaimDto());
         });  
         
         //Assert
-        Assert.Equal(expectedDescription, ex.Message);
-    }
-
-
-    public static IEnumerable<object?[]> GetInvalidClaims()
-    {
-        //Damage cost above threshold
-        yield return
-        [
-            new Cover()
-            {
-                Id = "123",
-                StartDate = DateOnly.Parse("2025-01-01"),
-                EndDate = DateOnly.Parse("2025-04-01"),
-                Type = CoverType.Yacht,
-                Premium = 10000
-            },
-            new ClaimDto()
-            {
-                ClaimType = ClaimType.Collision,
-                DamageCost = 100001M,
-                CoverId = "123",
-                CreatedDate = DateOnly.Parse("2025-01-02")
-            }, 
-            "DamageCost cannot exceed 100,000"
-        ];
-        
-        yield return
-        [
-            new Cover()
-            {
-                Id = "123",
-                StartDate = DateOnly.Parse("2025-01-01"),
-                EndDate = DateOnly.Parse("2025-04-01"),
-                Type = CoverType.Yacht,
-                Premium = 10000
-            },
-            new ClaimDto()
-            {
-                ClaimType = ClaimType.Collision,
-                DamageCost = 100001M,
-                CoverId = "123",
-                CreatedDate = DateOnly.Parse("2025-04-02")
-            }, 
-            "Claim date 2025-04-02 is not within the cover range: 2025-01-01 to 2025-04-01"
-        ];
-        
-        yield return
-        [
-            null,
-            new ClaimDto()
-            {
-                ClaimType = ClaimType.Collision,
-                DamageCost = 100001M,
-                CoverId = "123",
-                CreatedDate = DateOnly.Parse("2025-04-02")
-            }, 
-            "Claim date 2025-04-02 is not within the cover range: 2025-01-01 to 2025-04-01"
-        ];
+        Assert.Equal("FAIL", ex.Message);
     }
 }

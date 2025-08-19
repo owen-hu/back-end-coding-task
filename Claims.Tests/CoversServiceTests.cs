@@ -6,6 +6,7 @@ using Xunit;
 
 namespace Claims.Tests;
 
+[Trait("Category", "Unit")]
 public class CoversServiceTests
 {
     [Theory]
