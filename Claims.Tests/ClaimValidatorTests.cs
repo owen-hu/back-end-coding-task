@@ -127,8 +127,47 @@ public class CoverValidatorTests
         protected override DateTime Today => OverrideToday ?? base.Today;
     }
     
-    // [Theory]
-    
-    
-   
+    [Theory]
+    [MemberData(nameof(GetInvalidCovers))]
+    public async Task Invalid_Cover_Fails_Validation(CoverDto coverDto, string expectedDescription)
+    {
+        //AAA pattern:
+        
+        //Arrange:
+        var coverValidator = new TestCoverValidator();
+        
+        //Act
+        var ex = await Assert.ThrowsAnyAsync<Exception>( async () =>
+        {
+            await coverValidator.ValidateAsync(coverDto);
+        });  
+        
+        //Assert
+        Assert.Equal(expectedDescription, ex.Message);
+    }
+
+    public static IEnumerable<object?[]> GetInvalidCovers()
+    {
+        yield return
+        [
+            new CoverDto
+            {
+                StartDate = DateOnly.FromDateTime(DateTime.Today.AddDays(1)),
+                EndDate = DateOnly.FromDateTime(DateTime.Today.AddDays(400)),
+                CoverType = CoverType.Yacht,
+            },
+            "total insurance period cannot exceed 1 year"
+        ];
+
+        yield return
+        [
+            new CoverDto
+            {
+                StartDate = DateOnly.Parse("2001-01-01"),
+                EndDate = DateOnly.Parse("2001-03-01"),
+                CoverType = CoverType.Yacht
+            },
+            "StartDate cannot be in the past"
+        ];
+    }
 }

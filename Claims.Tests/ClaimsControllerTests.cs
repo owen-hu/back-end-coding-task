@@ -24,8 +24,12 @@ namespace Claims.Tests
             _appFixture = fixture;
         }
         
+        
+        /// <summary>
+        /// This list may or may not be empty!
+        /// </summary>
         [Fact]
-        public async Task Get_Claims_Empty_Returns_Empty_List()
+        public async Task Get_Claims_Returns_List()
         {
             var client = _appFixture.GetHttpClient();
             var response = await client.GetAsync("/Claims", TestContext.Current.CancellationToken);
@@ -37,26 +41,27 @@ namespace Claims.Tests
             var jsonText = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
             var claims = JsonSerializer.Deserialize<List<ClaimDto>>(jsonText);
             Assert.NotNull(claims); 
-            Assert.Empty(claims);
         }
 
 
-        [Theory]
-        [InlineData("456", "2025-01-01", 1000000, ClaimType.Collision)]
-        public async Task Add_Claim_And_Check_If_Present(string coverId, string createdDate, 
-            decimal damageCost, ClaimType claimType)
+        [Fact]
+        public async Task Add_Claim_And_Check_If_Present()
         {
+            //Add a cover first.
+            var today = DateOnly.FromDateTime(DateTime.Today);
+            var cover = await AddCover(today, today);
+            
             var claim = new ClaimDto()
             {
-                CoverId = coverId,
+                CoverId = cover.Id,
                 Name="",
-                CreatedDate = DateOnly.Parse(createdDate),
-                DamageCost = damageCost,
-                ClaimType = claimType,
+                CreatedDate = today,
+                DamageCost = 1000,
+                ClaimType = ClaimType.Collision,
             };
             
             var client = _appFixture.GetHttpClient();
-            
+
             var serializedClaim = JsonSerializer.Serialize(claim);
             
             var response = await client.PostAsync("/Claims", new StringContent(serializedClaim, Encoding.UTF8, "application/json"), TestContext.Current.CancellationToken);
@@ -70,10 +75,33 @@ namespace Claims.Tests
             });
             
             Assert.NotNull(responseClaim);
-            Assert.Equal(coverId, responseClaim.CoverId);
+            Assert.Equal(cover.Id, responseClaim.CoverId);
             Assert.NotNull(responseClaim.Id);
         }
-        
 
+        private async Task<CoverDto> AddCover(DateOnly startDate, DateOnly endDate)
+        {
+            var cover = new CoverDto()
+            {
+                StartDate = startDate,
+                EndDate = endDate,
+                CoverType = CoverType.Yacht,
+                Premium = 1000
+            };
+            var client = _appFixture.GetHttpClient();
+            var serializedCover = JsonSerializer.Serialize(cover);
+
+            var response = await client.PostAsync("/Covers", 
+                new StringContent(serializedCover, Encoding.UTF8, "application/json"), 
+                TestContext.Current.CancellationToken);
+            var jsonText = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+
+            return JsonSerializer.Deserialize<CoverDto>(jsonText, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                Converters = { new JsonStringEnumConverter() }
+            });
+        }
+        
     }
 }

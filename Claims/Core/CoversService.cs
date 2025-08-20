@@ -8,13 +8,15 @@ public class CoversService
 {
     private readonly IRepository<Cover> _coversRepo;
     private readonly IAuditor _auditor;
+    private readonly IValidator<CoverDto> _coverValidator;
     public IPremiumCalculator PremiumCalculator {get; init;}
     
-    public CoversService(IRepository<Cover> coversRepo, IAuditor auditor, IPremiumCalculator premiumCalculator)
+    public CoversService(IRepository<Cover> coversRepo, IAuditor auditor, IPremiumCalculator premiumCalculator, IValidator<CoverDto> coverValidator)
     {
         _coversRepo = coversRepo;
         _auditor = auditor;
         PremiumCalculator = premiumCalculator;
+        _coverValidator = coverValidator;
     }
     
     public async Task<IEnumerable<CoverDto>> GetAsync()
@@ -44,6 +46,7 @@ public class CoversService
 
     public async Task<CoverDto> CreateAndAuditAsync(CoverDto coverDto)
     {
+        await _coverValidator.ValidateAsync(coverDto);
         var premium = PremiumCalculator.Calculate(coverDto);
         var cover = await CreateCoverAsync(coverDto, premium);
         

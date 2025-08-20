@@ -54,6 +54,7 @@ builder.Services.AddScoped<IRepository<Cover>, CoversRepository>();
 builder.Services.AddScoped<IPremiumCalculator, BadPremiumCalculator>();
 builder.Services.AddScoped<IAuditor, Auditor>();
 builder.Services.AddScoped<IValidator<ClaimDto>, ClaimValidator>();
+builder.Services.AddScoped<IValidator<CoverDto>, CoverValidator>();
 builder.Services.AddScoped<ClaimsService, ClaimsService>();
 builder.Services.AddScoped<CoversService, CoversService>();
 

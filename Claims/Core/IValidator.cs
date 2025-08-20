@@ -84,12 +84,12 @@ public class CoverValidator : IValidator<CoverDto>
     {
         if (item.StartDate.DayNumber < DateOnly.FromDateTime(Today).DayNumber)
         {
-            throw new ValidationException("Date of creation cannot be greater than the current date.");
+            throw new ValidationException("StartDate cannot be in the past");
         }
 
         if (item.StartDate.ToDateTime(TimeOnly.MinValue).AddYears(1) < item.EndDate.ToDateTime(TimeOnly.MinValue))
         {
-            throw new ValidationException("Date of creation cannot be greater than the current date.");
+            throw new ValidationException("total insurance period cannot exceed 1 year");
         }
     }
 }
