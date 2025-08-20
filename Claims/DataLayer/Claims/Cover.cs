@@ -1,6 +1,7 @@
+using Claims.Core;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace Claims;
+namespace Claims.DataLayer.Claims;
 
 public class Cover
 {
@@ -8,25 +9,16 @@ public class Cover
     public string Id { get; set; }
 
     [BsonElement("startDate")]
-    [BsonDateTimeOptions(DateOnly = true)]
-    public DateTime StartDate { get; set; }
+    //[BsonDateTimeOptions(DateOnly = true)]
+    public DateOnly StartDate { get; set; }
 
     [BsonElement("endDate")]
-    [BsonDateTimeOptions(DateOnly = true)]
-    public DateTime EndDate { get; set; }
+    //[BsonDateTimeOptions(DateOnly = true)]
+    public DateOnly EndDate { get; set; }
 
     [BsonElement("claimType")]
     public CoverType Type { get; set; }
 
     [BsonElement("premium")]
     public decimal Premium { get; set; }
-}
-
-public enum CoverType
-{
-    Yacht = 0,
-    PassengerShip = 1,
-    ContainerShip = 2,
-    BulkCarrier = 3,
-    Tanker = 4
 }

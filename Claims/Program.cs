@@ -1,9 +1,13 @@
-using Claims.Auditing;
-using Claims.Controllers;
+using Claims.DataLayer.Auditing;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
+using Claims.ApiLayer;
+using Claims.Core;
+using Claims.DataLayer.Claims;
+using Claims.RepositoryLayer;
+using Claims.ServiceLayer;
 using Testcontainers.MongoDb;
 using Testcontainers.MsSql;
 
@@ -32,15 +36,38 @@ builder.Services
         x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
+var databaseName = "claims";
+var connectionString = sqlContainer.GetConnectionString().Replace("Database=master", $"Database={databaseName}");
+var mongoConnectionString = mongoContainer.GetConnectionString();
+
 builder.Services.AddDbContext<AuditContext>(options =>
-    options.UseSqlServer(sqlContainer.GetConnectionString()));
+    options.UseSqlServer(connectionString));
 
 builder.Services.AddDbContext<ClaimsContext>(options =>
 {
-    var client = new MongoClient(mongoContainer.GetConnectionString());
+    var client = new MongoClient(mongoConnectionString);
     var database = client.GetDatabase(builder.Configuration["MongoDb:DatabaseName"]); // Use a default/test database name
     options.UseMongoDB(database.Client, database.DatabaseNamespace.DatabaseName);
 });
+
+
+/*******************************************************************************************************
+ *******************************************************************************************************/
+
+//Add necessary Scoped Objects for Layered implementation
+builder.Services.AddScoped<IRepository<Claim>, ClaimsRepository>();
+builder.Services.AddScoped<IRepository<Cover>, CoversRepository>();
+builder.Services.AddScoped<IPremiumCalculator, BadPremiumCalculator>();
+// builder.Services.AddScoped<IAuditor, Auditor>();
+builder.Services.AddScoped<IAuditor, AsyncChannelAuditor>();
+builder.Services.AddScoped<IValidator<ClaimDto>, ClaimValidator>();
+builder.Services.AddScoped<IValidator<CoverDto>, CoverValidator>();
+builder.Services.AddScoped<ClaimsService, ClaimsService>();
+builder.Services.AddScoped<CoversService, CoversService>();
+
+/*******************************************************************************************************
+ *******************************************************************************************************/
+
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -66,6 +93,8 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<AuditContext>();
     context.Database.Migrate();
 }
+Console.WriteLine($"SQL Connection String: {connectionString}");
+Console.WriteLine($"MongoDB Connection String: {mongoConnectionString}");
 
 app.Run();
 

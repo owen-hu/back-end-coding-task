@@ -1,10 +1,15 @@
-﻿namespace Claims.Auditing
+﻿using Claims.DataLayer.Auditing;
+
+namespace Claims.Core
 {
-    public class Auditer
+    /// <summary>
+    /// Vanilla Auditor: Unchanged. No hierarchical separation.
+    /// </summary>
+    public class Auditor: IAuditor
     {
         private readonly AuditContext _auditContext;
 
-        public Auditer(AuditContext auditContext)
+        public Auditor(AuditContext auditContext)
         {
             _auditContext = auditContext;
         }
