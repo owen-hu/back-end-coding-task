@@ -50,7 +50,11 @@ builder.Services.AddDbContext<ClaimsContext>(options =>
     options.UseMongoDB(database.Client, database.DatabaseNamespace.DatabaseName);
 });
 
-//Add necessary Scoped Objects
+
+/*******************************************************************************************************
+ *******************************************************************************************************/
+
+//Add necessary Scoped Objects for Layered implementation
 builder.Services.AddScoped<IRepository<Claim>, ClaimsRepository>();
 builder.Services.AddScoped<IRepository<Cover>, CoversRepository>();
 builder.Services.AddScoped<IPremiumCalculator, BadPremiumCalculator>();
@@ -60,6 +64,10 @@ builder.Services.AddScoped<IValidator<ClaimDto>, ClaimValidator>();
 builder.Services.AddScoped<IValidator<CoverDto>, CoverValidator>();
 builder.Services.AddScoped<ClaimsService, ClaimsService>();
 builder.Services.AddScoped<CoversService, CoversService>();
+
+/*******************************************************************************************************
+ *******************************************************************************************************/
+
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
