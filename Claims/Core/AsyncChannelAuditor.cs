@@ -6,7 +6,7 @@ namespace Claims.Core;
 /// <summary>
 /// Simulates an async auditor that passes to a Service-Bus Queue.
 /// </summary>
-/// <remarks>NOt ana attempt to create a valid Queue architecture. Should be good enough for Demo purposes</remarks>
+/// <remarks>Not an attempt to create a valid Queue architecture. Should be good enough for Demo purposes</remarks>
 public class AsyncChannelAuditor : IAuditor
 {
     private readonly Auditor _innerAuditor;
