@@ -2,8 +2,10 @@
 Hi, a quick outline of my approach regarding the tasks
 
 ## Before I started: A few things broken that I changed
-I suspect that these 
 - Migration did not work on startup. I fixed this by creating a dummy migration.
+- MongoDB did not like the attribute **[BsonDateTimeOptions(DateOnly = true)]** . So I remved these and changed the 
+underlying type form DateTime to DateOnly.
+
 # Programming Task
 In the order that I started them, not the order that they were presented.
 
@@ -11,7 +13,7 @@ In the order that I started them, not the order that they were presented.
 I started this one first, as a way of ensuring that:
 - On completion of Task 1 I would have an architecture that had good separation of business logic from data handling
 - Ensure that I was (mostly) respecting the Single Responsibility principle.
-- That I could write tests that were not too complex or brittle, and relied only on what the expected functionality of 
+- That I could write tests that were not too complex or brittle, and rely only on what the expected functionality of 
 each class was, not how it was implemented.
 
 To that end:
@@ -19,6 +21,11 @@ To that end:
 - I added Moq to the Claims.Tests project so that I could inject requests and responses for my Unit Tests.
 - I used a TDD approach for tasks 1, 3 and 5.
 - I tried to keep the use of seams to a minimum, though this proved necessary for testing some of the Date-handling logic
+
+Tests are broken into 3 categories:
+- Integration
+- Unit
+- Failing (See Task 5: BadPremiumCalculator)
 
 ## Task 1
 I went for a traditional layered approach here, namely
@@ -56,7 +63,13 @@ Alternatives might include either:
 - Created an interface IPremiumCalculator
 - Wrote some tests (PremiumCalculatorTests)
 - Copy/Pasted original code into BadPremiumCalculator (Currently passing 4/33 tests)
-- Implemented 
+- Implemented a working solution: TranchedPremiumCalculator
+
+A few notes on the implementation:
+- TranchedPremiumCalculator.BasePremium + TranchedPremiumCalculator.GetTranches should both 
+ideally come from data. I've hard-coded them due to time constraints. 
+- This suffers from the same shortcomings as my solution to Task 3, namely that Premium calculation is likely very 
+complicated and might vary from customer to customer.
 
 ## Task 3
 One crucial assumption here: that "Fire and Forget" is an acceptable solution to logging audits.
