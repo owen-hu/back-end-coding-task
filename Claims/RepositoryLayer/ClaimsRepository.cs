@@ -1,6 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Claims.DataLayer.Claims;
+using Microsoft.EntityFrameworkCore;
 
-namespace Claims.DataLayer.Claims;
+namespace Claims.RepositoryLayer;
 
 public class ClaimsRepository: IRepository<Claim>
 {

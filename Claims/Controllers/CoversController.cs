@@ -2,10 +2,14 @@
 
 using Claims.ApiLayer;
 using Claims.Core;
+using Claims.ServiceLayer;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Claims.Controllers;
 
+/// <summary>
+/// Part of API Layer.
+/// </summary>
 [ApiController]
 [Route("[controller]")]
 public class CoversController : ControllerBase

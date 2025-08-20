@@ -1,8 +1,8 @@
 ﻿using Claims.ApiLayer;
+using Claims.Core;
 using Claims.DataLayer.Claims;
-using Microsoft.EntityFrameworkCore;
 
-namespace Claims.Core;
+namespace Claims.ServiceLayer;
 
 public class CoversService
 {

@@ -1,6 +1,7 @@
 ﻿using Claims.ApiLayer;
 using Claims.Core;
 using Claims.DataLayer.Claims;
+using Claims.ServiceLayer;
 using Xunit;
 using Moq;
 

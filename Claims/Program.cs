@@ -6,6 +6,8 @@ using System.Text.Json.Serialization;
 using Claims.ApiLayer;
 using Claims.Core;
 using Claims.DataLayer.Claims;
+using Claims.RepositoryLayer;
+using Claims.ServiceLayer;
 using Testcontainers.MongoDb;
 using Testcontainers.MsSql;
 

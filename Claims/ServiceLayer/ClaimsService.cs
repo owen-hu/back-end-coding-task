@@ -1,7 +1,8 @@
 ﻿using Claims.ApiLayer;
+using Claims.Core;
 using Claims.DataLayer.Claims;
 
-namespace Claims.Core;
+namespace Claims.ServiceLayer;
 
 public class ClaimsService
 {
